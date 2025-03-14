@@ -10,10 +10,13 @@ namespace MyFace.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUsersRepo _users;
+        private readonly LoginController _loginController;
 
-        public UsersController(IUsersRepo users)
+
+        public UsersController(IUsersRepo users, LoginController loginController)
         {
             _users = users;
+            _loginController = loginController;
         }
         
         [HttpGet("")]

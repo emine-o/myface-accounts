@@ -39,6 +39,7 @@ namespace MyFace
             });
 
             services.AddControllers();
+            services.AddHttpContextAccessor();
 
             services.AddTransient<IInteractionsRepo, InteractionsRepo>();
             services.AddTransient<IPostsRepo, PostsRepo>();

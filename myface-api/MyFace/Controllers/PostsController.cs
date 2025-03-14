@@ -10,10 +10,12 @@ namespace MyFace.Controllers
     public class PostsController : ControllerBase
     {    
         private readonly IPostsRepo _posts;
+        private readonly LoginController _loginController;
 
-        public PostsController(IPostsRepo posts)
+        public PostsController(IPostsRepo posts, LoginController loginController)
         {
             _posts = posts;
+            _loginController = loginController;
         }
         
         [HttpGet("")]
@@ -38,7 +40,14 @@ namespace MyFace.Controllers
             {
                 return BadRequest(ModelState);
             }
-            
+
+            bool isAuthHeaderCorrect = _loginController.CheckAuthHeader(newPost.UserId);
+
+            if (!isAuthHeaderCorrect)
+            {
+                return BadRequest("Authorization header is not correct.");
+            }
+
             var post = _posts.Create(newPost);
 
             var url = Url.Action("GetById", new { id = post.Id });
