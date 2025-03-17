@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using MyFace.Helpers;
 using MyFace.Models.Database;
 using MyFace.Models.Request;
 
@@ -59,6 +60,9 @@ namespace MyFace.Repositories
 
         public User Create(CreateUserRequest newUser)
         {
+            byte[] salt = SaltAndHashCreator.GetSalt();
+            string hashed = SaltAndHashCreator.GetHash(newUser.Password, salt);
+            
             var insertResponse = _context.Users.Add(new User
             {
                 FirstName = newUser.FirstName,
@@ -67,6 +71,8 @@ namespace MyFace.Repositories
                 Username = newUser.Username,
                 ProfileImageUrl = newUser.ProfileImageUrl,
                 CoverImageUrl = newUser.CoverImageUrl,
+                Salt = salt,
+                HashedPassword = hashed
             });
             _context.SaveChanges();
 

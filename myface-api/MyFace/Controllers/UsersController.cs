@@ -38,7 +38,7 @@ namespace MyFace.Controllers
             {
                 return BadRequest(ModelState);
             }
-            
+
             var user = _users.Create(newUser);
 
             var url = Url.Action("GetById", new { id = user.Id });
