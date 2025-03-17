@@ -26,7 +26,7 @@ namespace MyFace.Controllers
 
             if (!isAuthHeaderCorrect)
             {
-                return BadRequest("Authorization header is not correct.");
+                return Unauthorized("Authorization header is not correct.");
             }
 
             var users = _users.Search(searchRequest);
