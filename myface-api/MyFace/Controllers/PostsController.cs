@@ -10,17 +10,23 @@ namespace MyFace.Controllers
     public class PostsController : ControllerBase
     {    
         private readonly IPostsRepo _posts;
-        private readonly LoginController _loginController;
+        private readonly AuthController _authController;
 
-        public PostsController(IPostsRepo posts, LoginController loginController)
+        public PostsController(IPostsRepo posts, AuthController authController)
         {
             _posts = posts;
-            _loginController = loginController;
+            _authController = authController;
         }
         
         [HttpGet("")]
         public ActionResult<PostListResponse> Search([FromQuery] PostSearchRequest searchRequest)
         {
+            bool isAuthHeaderCorrect = _authController.CheckAuthHeader();
+
+            if (!isAuthHeaderCorrect)
+            {
+                return BadRequest("Authorization header is not correct.");
+            }
             var posts = _posts.Search(searchRequest);
             var postCount = _posts.Count(searchRequest);
             return PostListResponse.Create(searchRequest, posts, postCount);
@@ -41,7 +47,7 @@ namespace MyFace.Controllers
                 return BadRequest(ModelState);
             }
 
-            bool isAuthHeaderCorrect = _loginController.CheckAuthHeader(newPost.UserId);
+            bool isAuthHeaderCorrect = _authController.CheckAuthHeader();
 
             if (!isAuthHeaderCorrect)
             {
@@ -61,6 +67,13 @@ namespace MyFace.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            bool isAuthHeaderCorrect = _authController.CheckAuthHeader();
+
+            if (!isAuthHeaderCorrect)
+            {
+                return BadRequest("Authorization header is not correct.");
             }
 
             var post = _posts.Update(id, update);

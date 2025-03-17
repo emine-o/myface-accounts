@@ -10,18 +10,25 @@ namespace MyFace.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUsersRepo _users;
-        private readonly LoginController _loginController;
+        private readonly AuthController _authController;
 
 
-        public UsersController(IUsersRepo users, LoginController loginController)
+        public UsersController(IUsersRepo users, AuthController authController)
         {
             _users = users;
-            _loginController = loginController;
+            _authController = authController;
         }
         
         [HttpGet("")]
         public ActionResult<UserListResponse> Search([FromQuery] UserSearchRequest searchRequest)
         {
+            bool isAuthHeaderCorrect = _authController.CheckAuthHeader();
+
+            if (!isAuthHeaderCorrect)
+            {
+                return BadRequest("Authorization header is not correct.");
+            }
+
             var users = _users.Search(searchRequest);
             var userCount = _users.Count(searchRequest);
             return UserListResponse.Create(searchRequest, users, userCount);
