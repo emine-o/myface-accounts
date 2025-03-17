@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MyFace.Models.Request;
 using MyFace.Models.Response;
 using MyFace.Repositories;
@@ -10,23 +11,15 @@ namespace MyFace.Controllers
     public class PostsController : ControllerBase
     {    
         private readonly IPostsRepo _posts;
-        private readonly AuthController _authController;
 
-        public PostsController(IPostsRepo posts, AuthController authController)
+        public PostsController(IPostsRepo posts)
         {
             _posts = posts;
-            _authController = authController;
         }
         
         [HttpGet("")]
         public ActionResult<PostListResponse> Search([FromQuery] PostSearchRequest searchRequest)
         {
-            bool isAuthHeaderCorrect = _authController.CheckAuthHeader();
-
-            if (!isAuthHeaderCorrect)
-            {
-                return BadRequest("Authorization header is not correct.");
-            }
             var posts = _posts.Search(searchRequest);
             var postCount = _posts.Count(searchRequest);
             return PostListResponse.Create(searchRequest, posts, postCount);
@@ -39,19 +32,13 @@ namespace MyFace.Controllers
             return new PostResponse(post);
         }
 
+        [Authorize]
         [HttpPost("create")]
         public IActionResult Create([FromBody] CreatePostRequest newPost)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
-            }
-
-            bool isAuthHeaderCorrect = _authController.CheckAuthHeader();
-
-            if (!isAuthHeaderCorrect)
-            {
-                return BadRequest("Authorization header is not correct.");
             }
 
             var post = _posts.Create(newPost);
@@ -67,13 +54,6 @@ namespace MyFace.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
-            }
-
-            bool isAuthHeaderCorrect = _authController.CheckAuthHeader();
-
-            if (!isAuthHeaderCorrect)
-            {
-                return BadRequest("Authorization header is not correct.");
             }
 
             var post = _posts.Update(id, update);

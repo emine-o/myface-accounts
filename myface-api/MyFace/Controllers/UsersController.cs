@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MyFace.Models.Request;
 using MyFace.Models.Response;
 using MyFace.Repositories;
@@ -10,25 +11,17 @@ namespace MyFace.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUsersRepo _users;
-        private readonly AuthController _authController;
 
 
-        public UsersController(IUsersRepo users, AuthController authController)
+        public UsersController(IUsersRepo users)
         {
             _users = users;
-            _authController = authController;
         }
         
+        [Authorize]
         [HttpGet("")]
         public ActionResult<UserListResponse> Search([FromQuery] UserSearchRequest searchRequest)
         {
-            bool isAuthHeaderCorrect = _authController.CheckAuthHeader();
-
-            if (!isAuthHeaderCorrect)
-            {
-                return Unauthorized("Authorization header is not correct.");
-            }
-
             var users = _users.Search(searchRequest);
             var userCount = _users.Count(searchRequest);
             return UserListResponse.Create(searchRequest, users, userCount);
@@ -41,6 +34,7 @@ namespace MyFace.Controllers
             return new UserResponse(user);
         }
 
+        [Authorize]
         [HttpPost("create")]
         public IActionResult Create([FromBody] CreateUserRequest newUser)
         {

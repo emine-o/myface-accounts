@@ -1,6 +1,14 @@
 ﻿import React, {createContext, ReactNode, useState} from "react";
 
-export const LoginContext = createContext({
+export type MyFaceContextType = {
+    isLoggedIn: boolean;
+    isAdmin: boolean;
+    username: string;
+    password: string;
+    logIn: (username: string, password: string) => void;
+    logOut: () => void;
+}
+export const LoginContext = createContext<MyFaceContextType>({
     isLoggedIn: false,
     isAdmin: false,
     username: "",
@@ -19,8 +27,6 @@ export function LoginManager(props: LoginManagerProps): JSX.Element {
     const [password, setPassword] = useState("");
     
     function logIn(username: string, password: string) {
-        console.log('username in LoginManager', username)
-        console.log('password in LoginManager', password)
         setLoggedIn(true);
         setUsername(username);
         setPassword(password);
