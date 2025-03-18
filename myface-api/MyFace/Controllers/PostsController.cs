@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MyFace.Models.Request;
 using MyFace.Models.Response;
 using MyFace.Repositories;
@@ -31,6 +32,7 @@ namespace MyFace.Controllers
             return new PostResponse(post);
         }
 
+        [Authorize]
         [HttpPost("create")]
         public IActionResult Create([FromBody] CreatePostRequest newPost)
         {
@@ -38,7 +40,7 @@ namespace MyFace.Controllers
             {
                 return BadRequest(ModelState);
             }
-            
+
             var post = _posts.Create(newPost);
 
             var url = Url.Action("GetById", new { id = post.Id });

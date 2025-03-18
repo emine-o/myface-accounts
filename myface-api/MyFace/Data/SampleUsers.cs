@@ -120,7 +120,7 @@ namespace MyFace.Data
 
         private static User CreateRandomUser(int index)
         {
-            string password = PasswordGenerator.GetPassword(index);
+            string password = PasswordGenerator.GetPassword();
             byte[] salt = SaltAndHashCreator.GetSalt();
             string hashed = SaltAndHashCreator.GetHash(password, salt);
 

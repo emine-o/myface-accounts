@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MyFace.Models.Request;
 using MyFace.Models.Response;
 using MyFace.Repositories;
@@ -11,11 +12,13 @@ namespace MyFace.Controllers
     {
         private readonly IUsersRepo _users;
 
+
         public UsersController(IUsersRepo users)
         {
             _users = users;
         }
         
+        [Authorize]
         [HttpGet("")]
         public ActionResult<UserListResponse> Search([FromQuery] UserSearchRequest searchRequest)
         {
@@ -31,6 +34,7 @@ namespace MyFace.Controllers
             return new UserResponse(user);
         }
 
+        [Authorize]
         [HttpPost("create")]
         public IActionResult Create([FromBody] CreateUserRequest newUser)
         {
